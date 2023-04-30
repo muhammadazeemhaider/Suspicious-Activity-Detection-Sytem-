@@ -1,4 +1,9 @@
 \documentclass[title page]{article}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
 
 \title{Automated Video Summarization for Suspicious Event Detection By Making Pipeline}
 \author{Syed Muhammad Hussain $\mid$ Azeem Haider $\mid$ Affan Habib}
@@ -24,6 +29,8 @@
 
 \vspace{0.5cm}
 \textbf{\today} 
+\\ 
+\includegraphics[width=10cm]{LOGOHABIB.png} \\
 
 \vfill
 \end{center}
@@ -51,17 +58,43 @@ While many models have been proposed in the past, they have yet to be able to ac
 \\ \\
 Automated security surveillance has become a need of the hour for the people of Pakistan and Karachi. Our model can be a real game changer since it can be used to detect suspicious activities in the city. In addition, the model can also be used to summarize 24-hour CCTV footage so that individuals do not have to skim through entire footage to find suspicious activity.
 
-\section{Literature Review}
+\section{Dataset}
 
-This is section 2.
+The DCSASS (Distributed Camera System for Anomaly and Suspicious Spatio-Temporal event detection) dataset available on Kaggle is a video dataset that consists of 3,305 video clips of anomalous and normal events captured by a distributed camera system. This dataset was built based on a dataset created by Sultani et al. (2018) and contains additional annotations and labels.
+\\ \\ 
+The videos in this dataset were captured at different locations and times, such as airports, train stations, and university campuses. The videos are in the MP4 format and have a resolution of 640x360 pixels. The videos are divided into two classes: normal and anomalous events. The normal events include people walking, standing, and talking, while the anomalous events include actions like fighting, stealing, and vandalism.
+\\ \\
+This dataset contains videos based on the following 13 classes: Abuse, Arrest, Arson, Assault, Accident, Burglary, Explosion, Fighting, Robbery, Shooting, Stealing, Shoplifting, and Vandalism. Each video is labeled as normal (0) or abnormal (1) according to its content.
+\\ \\
+The DCSASS dataset includes a subset of surveillance camera videos that contain both normal and anomalous behaviors. Here's a brief overview of this subset:
 
-\subsection{Subsection 2.1}
+\begin{itemize}
 
-This is subsection 2.1.
+    \item \textbf{Size} The subset contains a total of 15 videos, each with a duration of approximately 5 minutes.
+    \item \textbf{Content} The videos show various scenes, such as arrest, burglary and shooting. The videos contain both normal and anomalous behaviors.
+    \item \textbf{Source} The videos were collected from public surveillance cameras in different locations.
+    \item \textbf{Usage} The videos can be used for a variety of purposes, such as training and testing of video-based anomaly detection algorithms, research on behavior analysis and crowd detection, and evaluation of surveillance systems.
 
-\subsection{Subsection 2.2}
+\end{itemize}
+	
+The dataset includes annotations for each video clip, including the start and end time of the event, the type of event (normal or anomalous), and a description of the event. Additionally, the dataset includes precomputed optical flow features for each video clip, which can be used for machine learning and computer vision algorithms.
+\\ \\
+This dataset can be used for research on anomaly detection in surveillance videos and can be used to develop and evaluate algorithms for detecting abnormal events in real-world scenarios.
+\\ \\
+Overall, the surveillance camera video subset of the DCSASS dataset provides a useful resource for researchers and practitioners in the field of surveillance and security. It provides a realistic and diverse set of videos for testing and evaluation of surveillance systems and anomaly detection algorithms.
+\\ \\
+All in all, there is a total of 16853 videos, where 9676 videos are labeled as Normal and 7177 as abnormal.
 
-This is subsection 2.2.
+\subsection{Test Dataset}
+We will test our model on dataset created and collected by our ownself. Since our project focuses on problems and suspicious activities in the local context, it is imperative to test our model on videos and clips taken in the local surrounding. 
+\\ \\
+For this purpose, we will be collecting suspicious activity videos from the internet and test our model on them. When collecting data for testing the model, it's important to ensure that the data is diverse and representative of the local context. This can be achieved by collecting videos from various sources, such as social media platforms, local news outlets, and community forums.
+\\ \\
+To ensure the reliability and authenticity of the data, it's also important to verify the source of each video and confirm that it is not manipulated or altered in any way. This can be done by cross-checking the video with other sources or contacting the original uploader for verification. Furthermore, it's important to consider the privacy and ethical implications of collecting and using this data. To avoid any legal issues or violation of individuals' privacy, the collected videos should be anonymized and any personally identifiable information removed.
+\\ \\
+Once the data is collected, it's important to label and categorize each video according to the type of suspicious activity captured. This will help in training and testing the model, as well as evaluating its accuracy and effectiveness.
+\\ \\
+When testing the model, it's important to use a validation dataset to ensure that the model is not overfitting on the training data. This can be done by using a separate dataset for validation and testing purposes, which should also be diverse and representative of the local context.
 
 \section{Methodology}
 
@@ -77,12 +110,65 @@ The research design consists of the following steps:
     \item \textbf{Evaluation:} The efficiency and effectiveness of the proposed method will be evaluated using several metrics such as detection rate, false-positive rate, and accuracy. The evaluation will be performed on a separate dataset to ensure the generalizability of the proposed method.   
 \end{itemize}
 
-\subsection{Video Summarization}
+\subsection{Video Summarization Model}
 
+The first stage model is used for motion detection in a video file using the OpenCV library in Python. The model reads a video file and identifies frames where there is a significant change in the content of the video. The method used for motion detection is based on the absolute difference of pixel values between consecutive frames. The code sets a threshold value for the difference between consecutive frames, and if the difference is greater than the threshold, the frame is considered as a unique frame and is written to the output video file. Otherwise, the frame is considered a common frame. The code uses a while loop to read frames from the video until the end of the video is reached. 
+\\ \\
+The model initialize the counters that are used to keep track of the number of unique frames, common frames, and total frames processed. The output of the model is an output video file that contains only the frames with significant changes in content. The model also prints the total number of frames, the number of unique frames, and the number of common frames detected.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Picture1.jpg}
+    \caption{Image of Memory before Sorting}
+    \label{fig:1t}
+\end{figure}
+
+We have completed our testing on this model and produced a desired results and pushed this on our Project repository. Here is the link of the first stage model.
+
+\subsection{Abnormal Event Detection Model}
+
+After conducting a thorough literature review, we have selected two approaches for the second stage of our methodology. In this stage, we will analyze and compare both of these approaches for Abnormal Events Detection and Recognition.
+
+\subsubsection{ConvLSTM Approach}
+
+In this step, we implement the first approach by using a combination of ConvLSTM cells. A ConvLSTM cell is a variant of an LSTM network that contains convolutions operations in the network. it is an LSTM with convolution embedded in the architecture, which makes it capable of identifying spatial features of the data while keeping into account the temporal relation. For video classification, this approach effectively captures the spatial relation in the individual frames and the temporal relation across the different frames. As a result of this convolution structure, the ConvLSTM is capable of taking in 3-dimensional input \(width, height, num\_of\_channels\) whereas a simple LSTM only takes in 1-dimensional input hence an LSTM is incompatible for modeling Spatio-temporal data on its own.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Picture2.jpg}
+    \caption{ConvLSTM Approach}
+    \label{fig:2}
+\end{figure}
+
+\subsubsection{LRCN Approach}
+
+In this step, we implement the LRCN Approach by combining Convolution and LSTM layers in a single model. Another similar approach can be to use a CNN model and LSTM model trained separately. The CNN model can be used to extract spatial features from the frames in the video, and for this purpose, a pre-trained model can be used, that can be fine-tuned for the problem. And the LSTM model can then use the features extracted by CNN, to predict the action being performed in the video. But here, we implement another approach known as the Long-term Recurrent Convolutional Network (LRCN), which combines CNN and LSTM layers in a single model. 
+\\ \\
+The Convolutional layers are used for spatial feature extraction from the frames, and the extracted spatial features are fed to LSTM layer\(s\) at each time-steps for temporal sequence modeling. This way the network learns spatiotemporal features directly in an end-to-end training, resulting in a robust model.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Picture3.jpg}
+    \caption{LRCN Approach}
+    \label{fig:3}
+\end{figure}
+
+We have completed the preprocessing steps, data set splitting and generation for both approaches. Currently, we are in the process of creating the data set required to train and test these models. here is the link of the model 
 
 \section{Conclusion}
 
-This is the conclusion section.
+Our project has been carried out in a systematic manner. We first researched about our topic and if it has been covered already. We soon found out that the dual model strategy has not been put into place by anyone yet, and doing that would help people in our city and our country. 
+\\ \\
+We then moved on to writing a literature review, which we have submitted as our previous submission, at the end of the literature review we had a good enough idea what work has already been carried out and what we can do to differentiate our project from pre-existing work. 
+\\ \\
+The next stage which we are also done with, is selecting the dataset, as described in the section for Dataset, we will be training our model of the DCSASS dataset and then testing it on dataset we will create ourself from videos collected from the internet.
+\\ \\
+Finally, we have also researched models for both our purposes. We have finalized the model for video summarization, and have been testing two models the ConvLSTM, and the LRCN model for our object recognition. 
+\\ \\
+Overall, our project has been moving smoothly and we expect to finish it soon with a high accuracy for our object recognition model. 
+
+\section{Github}
+
+\href{https://github.com/SYED-M-HUSSAIN/Computer-Vision-Research-}{https://github.com/SYED-M-HUSSAIN/Computer-Vision-Research-}
 
 \end{document}
